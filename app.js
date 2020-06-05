@@ -32,6 +32,7 @@ app.use('/useradd', (req, res) => {
     var Password = req.query.Password;
     var Name = req.query.Name;
     var Phone = req.query.phone;
+    
     db.execute("INSERT INTO USER (ID, Email, Password, Name, Phone) VALUES ('','" + Email + "','" + Password + "','" + Name + "','" + Phone + "') ")
         .then(results => {
             res.send("inserted")
@@ -44,16 +45,19 @@ app.use('/useradd', (req, res) => {
 app.use('/userlogin', (req, res) => {
     var Email = req.query.Email;
     var Password = req.query.Password;
-    db.execute("SELECT * FROM USER WHERE Email = '" + Email + "' AND Password = '" + Password + "'  ")
+    console.log(Email)
+    console.log(Password)
+    db.execute("SELECT * FROM user WHERE Email = '" + Email + "' AND Password = '" + Password + "'  ")
         .then(results => {
+            console.log(results);
             if (results[0].length > 0) {
-                res.send("1");
+                res.send(results[0])
             }
             else {
                 res.send("0");
-            }
+            }   
 
-            res.send(results[0])
+            
         })
         .catch(err => {
             console.log(err)
@@ -62,7 +66,65 @@ app.use('/userlogin', (req, res) => {
 
 app.use('/userprofile', (req, res) => {
     var Email = req.query.Email;
+    
     db.execute("SELECT * FROM USER WHERE Email = '" + Email + "' ")
+        .then(results => {
+            if (results[0].length > 0) {
+                console.log("HElooo");
+                res.send(results[0]);
+            }
+            else {
+                res.send("0");
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+//trip count
+app.use('/usertripscount', (req, res) => {
+    var Email = req.query.Email;
+   
+    db.execute("SELECT COUNT(*) as count FROM savetrips WHERE UserEmail = '" + Email + "' ")
+        .then(results => {
+            if (results[0].length > 0) {
+                //console.log("HElooo123");
+                res.send(results[0]);
+            }
+            else {
+                res.send("0");
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+//place count
+app.use('/userplacescount', (req, res) => {
+    var Email = req.query.Email;
+   
+    db.execute("SELECT COUNT(*) as count FROM saveplaces WHERE UserEmail = '" + Email + "' ")
+        .then(results => {
+            if (results[0].length > 0) {
+                console.log("HElooo123");
+                res.send(results[0]);
+            }
+            else {
+                res.send("0");
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+//review count
+app.use('/userreviewscount', (req, res) => {
+    var Email = req.query.Email;
+   
+    db.execute("SELECT COUNT(*) as count FROM review WHERE Email = '" + Email + "' ")
         .then(results => {
             if (results[0].length > 0) {
                 res.send(results[0]);
@@ -82,9 +144,6 @@ app.use('/addreview', (req, res) => {
     var Review = req.query.Review;
     var Rating = req.query.Rating;
 
-
-    //console.log(Email + PlaceID + Review)
-
     db.execute("Insert into review (PlaceID, Email, Review, Rating) values ('" + PlaceID + "', '" + Email + "', '" + Review + "', '" + Rating + "') ")
 
         .then(results => {
@@ -98,10 +157,8 @@ app.use('/addreview', (req, res) => {
 app.use('/getreview', (req, res) => {
     var Email = req.query.Email;
     var PlaceID = req.query.PlaceID;
-    db.execute("SELECT * FROM review WHERE Email = '" + Email + "' && PlaceID = '" + PlaceID + "' order by id desc limit 1 ")
+    db.execute("SELECT * FROM review WHERE PlaceID = '" + PlaceID + "'  ")
         .then(results => {
-            console.log("results[0]")
-            // console.log(results[0])
             res.send(results[0]);
 
         })
@@ -116,14 +173,60 @@ app.use('/savetrip', (req, res) => {
     var DepartureID = req.query.DepartureID;
     var DestinationID = req.query.DestinationID;
     var Waypoints = req.query.Waypoints;
+    var StartTime = req.query.StartTime;
+    var TripStartDate = req.query.TripStartDate;
+    var LunchTime = req.query.LunchTime;
+    var DinnerTime = req.query.DinnerTime;
+    var DepartureName = req.query.DepartureName;
+    var DestinationName = req.query.DestinationName ;
 
+    console.log(TripStartDate)
 
-    //console.log(Email + PlaceID + Review)
+    db.execute("Insert into savetrips (UserEmail, DepartureID, DestinationID, Waypoints, DepartureName, DestinationName, StartDate, StartTime, LunchTime, DinnerTime) values ('" + Email + "', '" + DepartureID + "', '" + DestinationID + "', '" + Waypoints + "' , '" + DepartureName + "' , '" + DestinationName + "' , '" + TripStartDate + "', '" + StartTime + "', '" + LunchTime + "', '" + DinnerTime + "'  ) ")
 
-    db.execute("Insert into savetrips (UserEmail, DepartureID, DestinationID, Waypoints) values ('" + Email + "', '" + DepartureID + "', '" + DestinationID + "', '" + Waypoints + "') ")
+        .then(results => {
+            console.log("inserted")
+            res.send("inserted")
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+app.use('/saveplace', (req, res) => {
+
+    var Email = req.query.Email;
+    var PlaceName = req.query.PlaceName;
+    var PlaceID = req.query.PlaceID;
+    var PlacePhoto = req.query.PlacePhoto;
+    
+
+    db.execute("Insert into saveplaces (UserEmail, SpotID, SpotPhotoReference, SpotName) values ('" + Email + "', '" + PlaceID + "', '" + PlacePhoto + "', '" + PlaceName + "') ")
 
         .then(results => {
             res.send("inserted")
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+app.use('/checksaveplace', (req, res) => {
+
+    var Email = req.query.Email;
+    var PlaceID = req.query.PlaceID;
+    
+
+    db.execute("select * from saveplaces where UserEmail='"+Email+"' && SpotID='"+PlaceID+"' ")
+
+        .then(results => {
+            if (results[0].length > 0) {
+                res.send('1');
+            }
+            else
+            {
+                res.send('0');
+            }
         })
         .catch(err => {
             console.log(err)
@@ -146,7 +249,40 @@ app.use('/getsavedtrips', (req, res) => {
         });
 });
 
+app.use('/getsavedplaces', (req, res) => {
+    var Email = req.query.Email;
+    db.execute("SELECT * FROM saveplaces WHERE UserEmail = '" + Email + "' ")
+        .then(results => {
+            if (results[0].length > 0) {
+                res.send(results[0]);
+            }
+            else {
+                res.send("No Places Saved!");
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
+app.use('/getreviews', (req, res) => {
+    var Email = req.query.Email;
+    db.execute("SELECT * FROM review WHERE Email = '" + Email + "' ")
+        .then(results => {
+            if (results[0].length > 0) {
+                res.send(results[0]);
+            }
+            else {
+                res.send("No Reviews Saved!");
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        });
+});
+
 app.use('/getsavedtripsbyid', (req, res) => {
+
     var id = req.query.id;
     db.execute("SELECT * FROM savetrips WHERE id = '" + id + "' ")
         .then(results => {
@@ -160,7 +296,5 @@ app.use('/getsavedtripsbyid', (req, res) => {
         .catch(err => {
             console.log(err)
         });
+
 });
-
-
-
