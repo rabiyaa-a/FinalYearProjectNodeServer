@@ -46,10 +46,8 @@ app.use('/userlogin', (req, res) => {
     var Email = req.query.Email;
     var Password = req.query.Password;
     console.log(Email)
-    console.log(Password)
-    db.execute("SELECT * FROM user WHERE Email = '" + Email + "' AND Password = '" + Password + "'  ")
+    db.execute("SELECT * FROM USER WHERE Email = '" + Email + "' AND Password = '" + Password + "'  ")
         .then(results => {
-            console.log(results);
             if (results[0].length > 0) {
                 res.send(results[0])
             }
@@ -157,7 +155,7 @@ app.use('/addreview', (req, res) => {
 app.use('/getreview', (req, res) => {
     var Email = req.query.Email;
     var PlaceID = req.query.PlaceID;
-    db.execute("SELECT * FROM review WHERE PlaceID = '" + PlaceID + "'  ")
+    db.execute("SELECT * FROM review WHERE Email = '" + Email + "' && PlaceID = '" + PlaceID + "' order by id desc limit 1 ")
         .then(results => {
             res.send(results[0]);
 
@@ -179,10 +177,11 @@ app.use('/savetrip', (req, res) => {
     var DinnerTime = req.query.DinnerTime;
     var DepartureName = req.query.DepartureName;
     var DestinationName = req.query.DestinationName ;
+    var TripType = req.query.TripType ;
 
     console.log(TripStartDate)
 
-    db.execute("Insert into savetrips (UserEmail, DepartureID, DestinationID, Waypoints, DepartureName, DestinationName, StartDate, StartTime, LunchTime, DinnerTime) values ('" + Email + "', '" + DepartureID + "', '" + DestinationID + "', '" + Waypoints + "' , '" + DepartureName + "' , '" + DestinationName + "' , '" + TripStartDate + "', '" + StartTime + "', '" + LunchTime + "', '" + DinnerTime + "'  ) ")
+    db.execute("Insert into savetrips (UserEmail, DepartureID, DestinationID, Waypoints, DepartureName, DestinationName, StartDate, StartTime, LunchTime, DinnerTime, TripType) values ('" + Email + "', '" + DepartureID + "', '" + DestinationID + "', '" + Waypoints + "' , '" + DepartureName + "' , '" + DestinationName + "' , '" + TripStartDate + "', '" + StartTime + "', '" + LunchTime + "', '" + DinnerTime + "' , '" + TripType + "'  ) ")
 
         .then(results => {
             console.log("inserted")
